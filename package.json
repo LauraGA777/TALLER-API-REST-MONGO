@@ -1,0 +1,20 @@
+{
+  "name": "taller4-node",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Laura",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "16.4.5",
+    "express": "4.19.2",
+    "mongoose": "8.6.1",
+    "mongoose-sequence": "^6.0.1"
+  }
+}
