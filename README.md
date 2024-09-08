@@ -119,7 +119,10 @@ Calcula la tarifa basada en la diferencia entre `entryDate` y `exitDate`. La tar
 Inicia el servidor:
 
 ```bash
-npm start o
+npm start
+```
+O
+```bash
 node index.js
 ```
 
