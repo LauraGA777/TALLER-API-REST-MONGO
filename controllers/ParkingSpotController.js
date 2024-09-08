@@ -48,7 +48,6 @@ export const getParkingSpotsByStatus = async (req, res) => {
     }
 }
 
-
 // PUT /parking-spots/{id}: Actualiza una celda específica.
 export const updateParkingSpot = async (req, res) => {
     try {
@@ -75,7 +74,7 @@ export const deleteParkingSpot = async (req, res) => {
 export const parkVehicle = async (req, res) => {
     try {
         const { vehiclePlate } = req.body;
-        
+
         // Buscar una celda disponible
         const availableSpot = await ParkingSpot.findOne({ status: 'available' });
         const entryDate = new Date(availableSpot.entryDate);
@@ -121,18 +120,16 @@ export const calculateFee = async (req, res) => {
         const hours = Math.floor(diff / (1000 * 60 * 60)); // Calcula las horas redondeando hacia abajo
         const fee = (hours < 1 ? 1 : hours) * 5000; // Si las horas son menores a 1, cobra por 1 hora
 
-        return res.status(200).json({ tarifa:fee, horas:hours });
+        return res.status(200).json({ tarifa: fee, horas: hours });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
 
-
 // Método para generar un pin
 const generatePin = (spotNumber, vehiclePlate) => {
     return `${spotNumber}-${vehiclePlate}`;
 };
-
 
 // Method for exiting: Cambia el status a "available", vacía los campos vehiclePlate, entryDate, exitDate, y pin.
 export const exitParkingSpot = async (req, res) => {
