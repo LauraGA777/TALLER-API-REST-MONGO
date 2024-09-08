@@ -40,12 +40,14 @@ export const getParkingSpots = async (req, res) => {
 // GET /parking-spots/{status}: Lista todas las celdas según su estado (available/unavailable).
 export const getParkingSpotsByStatus = async (req, res) => {
     try {
-        const parkingSpots = await ParkingSpot.find({ status: req.params.status });
+        const status = req.query.status; // Obtener el parámetro de la query
+        const parkingSpots = await ParkingSpot.find({ status: status });
         return res.status(200).json(parkingSpots);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
+
 
 // PUT /parking-spots/{id}: Actualiza una celda específica.
 export const updateParkingSpot = async (req, res) => {
@@ -68,6 +70,31 @@ export const deleteParkingSpot = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+// Method for parking: Este método debe buscar una celda disponible, asignar la placa del vehículo y cambiar su estado a "unavailable". Además, se registra la fecha de ingreso (entryDate).
+
+export const parkVehicle = async (req, res) => {
+    try {
+        const { vehiclePlate } = req.body;
+        
+        // Buscar una celda disponible
+        const availableSpot = await ParkingSpot.findOne({ status: 'available' });
+        const entryDate = new Date(availableSpot.entryDate);
+        if (!availableSpot) {
+            return res.status(404).json({ message: 'No available parking spots' });
+        }
+
+        // Asignar la placa y cambiar el estado
+        availableSpot.vehiclePlate = vehiclePlate;
+        availableSpot.status = 'unavailable';
+        availableSpot.entryDate = entryDate; // Fecha de ingreso
+        availableSpot.pin = generatePin(availableSpot.spotNumber, vehiclePlate); // Generar pin
+        await availableSpot.save();
+
+        return res.status(200).json(availableSpot);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 
 // Method to calculate fee: Calcula el valor a pagar basado en la diferencia entre entryDate y exitDate.
 export const calculateFee = async (req, res) => {
@@ -79,14 +106,33 @@ export const calculateFee = async (req, res) => {
 
         const entryDate = new Date(parkingSpot.entryDate);
         const exitDate = new Date(parkingSpot.exitDate);
-        const diff = Math.abs(exitDate - entryDate);
-        const hours = Math.ceil(diff / (1000 * 60 * 60));  // Se aproxima al valor entero más cercano hacia arriba
-        const fee = hours * 5000;  // Se cobrará 5000 COP por hora
-        return res.status(200).json({ fee });
+
+        // Asegúrate de que las fechas sean válidas
+        if (isNaN(entryDate.getTime()) || isNaN(exitDate.getTime())) {
+            return res.status(400).json({ message: 'Invalid date format' });
+        }
+
+        // Verifica que entryDate sea anterior a exitDate
+        if (entryDate > exitDate) {
+            return res.status(400).json({ message: 'Entry date cannot be later than exit date' });
+        }
+
+        const diff = exitDate - entryDate; // Diferencia en milisegundos
+        const hours = Math.floor(diff / (1000 * 60 * 60)); // Calcula las horas redondeando hacia abajo
+        const fee = (hours < 1 ? 1 : hours) * 5000; // Si las horas son menores a 1, cobra por 1 hora
+
+        return res.status(200).json({ tarifa:fee, horas:hours });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
+
+
+// Método para generar un pin
+const generatePin = (spotNumber, vehiclePlate) => {
+    return `${spotNumber}-${vehiclePlate}`;
+};
+
 
 // Method for exiting: Cambia el status a "available", vacía los campos vehiclePlate, entryDate, exitDate, y pin.
 export const exitParkingSpot = async (req, res) => {

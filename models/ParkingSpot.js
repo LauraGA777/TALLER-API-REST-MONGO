@@ -18,19 +18,21 @@ const parkingSpotSchema = new Schema({
         match: /^[A-Z0-9]+$/i 
     },
     entryDate: {
-        type: Date,
+        type: Date, // ISO (YYYY-MM-DDTHH:mm:ssZ)
+        default: null, // Permite que sea null inicialmente
         validate: {
             validator: function(v) {
-                return v instanceof Date && !isNaN(v);  
+                return v === null || (v instanceof Date && !isNaN(v));  
             },
             message: props => `${props.value} is not a valid date!`
         }
     },
     exitDate: {
-        type: Date,
+        type: Date, // ISO (YYYY-MM-DDTHH:mm:ssZ)
+        default: null, // Permite que sea null inicialmente
         validate: {
             validator: function(v) {
-                return v instanceof Date && !isNaN(v);  
+                return v === null || (v instanceof Date && !isNaN(v));  
             },
             message: props => `${props.value} is not a valid date!`
         }

@@ -9,7 +9,7 @@ export default class Server {
         this.listen();
         this.connectDB();
         this.paths = {
-            parkingSpots: '/parking'
+            parkingSpots: '/parking-spots'
         };
         this.middlewares();
         this.routes();
@@ -30,12 +30,10 @@ export default class Server {
 
     middlewares() {
         this.app.use(express.json());
-        // Puedes agregar más middlewares aquí si es necesario
     }
 
     routes() {
         this.app.use(this.paths.parkingSpots, ParkingSpotRoute);
-        // Puedes agregar más rutas aquí si es necesario
     }
 
 
