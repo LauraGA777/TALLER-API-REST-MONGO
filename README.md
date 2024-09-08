@@ -114,6 +114,11 @@ Registra la salida de un vehículo. Cambia el estado de la celda a disponible y 
 
 Calcula la tarifa basada en la diferencia entre `entryDate` y `exitDate`. La tarifa se cobra a 5000 COP por hora.
 
+# Despliegue
+El sistema también está desplegado en Render.com. Puedes acceder a la aplicación en el siguiente enlace:
+
+- https://taller-api-rest-mongo.onrender.com
+
 ## Ejecución
 
 Inicia el servidor:
